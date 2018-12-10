@@ -1,4 +1,5 @@
 import React from 'react';
+import './Form.css';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
@@ -15,51 +16,44 @@ const theme = createMuiTheme({
     overrides: {
         MuiInput: {
             root: {
-                fontSize: 24,
+                fontSize: 18,
+                color: 'white',
+                border: '1px solid white',
+                borderRadius: '3px',
+                padding: '5px',
+            },
+            input: {
+                padding: '5px 0'
+            },
+            focused: {
+                borderColor: teal[100],
+            },
+            error: {
+                borderColor: red[500],
+            },
+        },
+        MuiButton: {
+            root: {
+                background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+                borderRadius: 3,
+                border: 0,
+                color: 'white',
+                height: 48,
+                padding: '0 30px',
+                boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
+                cursor: 'pointer'
+            },
+            disabled: {
+                background: 'linear-gradient(45deg, #ccc 30%, #ccc 90%)',
+                boxShadow: 'none'
+            },
+            label: {
                 color: 'white',
             },
-            
-            underline: {
-                '&:before': {
-                    borderBottom: 'none',
-                    color: 'red'
-                },
-            }
-        },
-        MuiInputBase: {
-            input: {
-                border: 'none',
-                '&$before': {
-                    border: 'none'
-                }
-            }
-        },
-        // Name of the component ⚛️ / style sheet
-        MuiButton: {
-            label: {
-                color: 'black',
-                '&:hover': {
-                    color: 'white'
-                }
-            },
-          // Name of the rule
-          root: {
-            // Some CSS
-            background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-            borderRadius: 3,
-            border: 0,
-            color: 'white',
-            height: 48,
-            padding: '0 30px',
-            boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
-            '&$hover': {
-                color: 'black',
-            }
-          },
         },
       },
     typography: {
-        fontSize: 8,
+        fontSize: 16,
         useNextVariants: true,
     },
     palette: {
@@ -70,14 +64,14 @@ const theme = createMuiTheme({
         dark: teal[700],
       },
       secondary: {
-        light: red[100],
-        main: red[500],
-        dark: red[700],
-      },
-      error: {
         light: yellow[100],
         main: yellow[500],
         dark: yellow[700],
+      },
+      error: {
+        light: red[100],
+        main: red[500],
+        dark: red[700],
       }
     },
   });
@@ -106,18 +100,19 @@ const validate = values => {
       'name',
       'last_name',
       'password',
+      'email',
     ]
     requiredFields.forEach(field => {
       if (!values[field]) {
         errors[field] = 'Required'
       }
     })
-    if(values.name && values.name.length < 6){
-        console.log(values.name)
-        errors.name = 'Plese eneter your name'
+    if(values.password && values.password.length < 6){
+        errors.password = 'Name should be longer than 6'
     }
-    
-   
+    if(values.email && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)){
+        errors.email = 'Invalid email address'
+    }
     return errors
   }
 
@@ -127,6 +122,7 @@ class TextFields extends React.Component {
     name: '',
     last_name: '',
     password: '',
+    email: '',
   };
 
   handleChange = name => event => {
@@ -136,7 +132,8 @@ class TextFields extends React.Component {
     });
   };
 
-  sendFormHander = () => {
+  sendFormHander = (reset) => {
+      reset()
       console.log(this.state)
   }
 
@@ -151,12 +148,20 @@ class TextFields extends React.Component {
     return <TextField
         label={label}
         helperText={touched && error}
-        // className={classes.textField}
         value={this.state[name]}
         errorText={touched && error}
-        // onChange={onChange}
-        margin="normal"
-        error={touched && error&& true}
+        margin="dense"
+        error={touched && error && true}
+        InputProps={{
+            disableUnderline: true
+        }}
+        InputLabelProps={{
+            shrink: true,
+        }}
+        FormHelperTextProps={{
+            filled: true,
+            focused: true
+        }}
         {...input}
         {...custom}
     />
@@ -164,47 +169,56 @@ class TextFields extends React.Component {
 
   render() {
     // const { classes } = this.props;
-    const { handleSubmit, pristine, reset, submitting } = this.props
+    const { handleSubmit, pristine, reset, invalid, submitting } = this.props
 
     return (
         <MuiThemeProvider theme={theme}>
             <div>
-                {/* <Paper className={classes.root} elevation={4}> */}
-                <Paper elevation={4}>
+                <Paper className='customPaper' elevation={4}>
                     <Typography component="p">
                         Forms
                     </Typography>
-                    {/* <form onSubmit={handleSubmit} className={classes.container} noValidate autoComplete="off"> */}
                     <form onSubmit={this.sendFormHander}  noValidate autoComplete="off">
-                    <Grid container direction='column' nowrap justify='center' spacing={16}>
-                        <Grid item sm={12}>
-                            <Field
-                                name="name"
-                                component={this.renderTextField}
-                                label="First Name"
-                                onChange={this.handleChange("name")}
-                            />
-                        </Grid>
-                        <Grid item sm={12}>
-                        <Field
-                                name="last_name"
-                                component={this.renderTextField}
-                                label="Last name"
-                            />
-                        </Grid>
-                        <Grid item sm={12}>
-                            <Field
-                                name="password"
-                                component={this.renderTextField}
-                                label="Password"
-                                type="password"
-                            />
-                        </Grid>
-                        <Grid item sm={12}>
-                            <Button disabled={pristine} onClick={this.sendFormHander} variant="contained" color="primary" >
-                                Send form 
-                            </Button>
-                        </Grid>
+                        <Grid container direction='column' nowrap justify='center' spacing={16}>
+                            <Grid item sm={12}>
+                                <Field
+                                    name="name"
+                                    component={this.renderTextField}
+                                    label="Name"
+                                    onChange={this.handleChange("name")}
+                                />
+                            </Grid>
+                            <Grid item sm={12}>
+                                <Field
+                                    name="last_name"
+                                    component={this.renderTextField}
+                                    label="Last name"
+                                    onChange={this.handleChange("last_name")}
+                                />
+                            </Grid>
+                            <Grid item sm={12}>
+                                <Field
+                                    name="password"
+                                    component={this.renderTextField}
+                                    label="Password"
+                                    type="password"
+                                    onChange={this.handleChange("password")}
+                                />
+                            </Grid>
+                            <Grid item sm={12}>
+                                <Field
+                                    name="email"
+                                    component={this.renderTextField}
+                                    label="Email"
+                                    type="email"
+                                    onChange={this.handleChange("email")}
+                                />
+                            </Grid>
+                            <Grid item sm={12}>
+                                <Button disabled={pristine || invalid} onClick={this.sendFormHander.bind(this, reset)}  >
+                                    Send form 
+                                </Button>
+                            </Grid>
                         </Grid>
                     </form>
                 </Paper>
@@ -217,7 +231,6 @@ class TextFields extends React.Component {
 TextFields = reduxForm({ 
     form: 'contact',
     validate,
-    
 })(TextFields);
 
 
