@@ -149,7 +149,6 @@ class TextFields extends React.Component {
         label={label}
         helperText={touched && error}
         value={this.state[name]}
-        errorText={touched && error}
         margin="dense"
         error={touched && error && true}
         InputProps={{
@@ -169,6 +168,7 @@ class TextFields extends React.Component {
 
   render() {
     // const { classes } = this.props;
+    // console.log(classes)
     const { handleSubmit, pristine, reset, invalid, submitting } = this.props
 
     return (
@@ -179,7 +179,7 @@ class TextFields extends React.Component {
                         Forms
                     </Typography>
                     <form onSubmit={this.sendFormHander}  noValidate autoComplete="off">
-                        <Grid container direction='column' nowrap justify='center' spacing={16}>
+                        <Grid container direction='column' wrap='nowrap' justify='center' spacing={16}>
                             <Grid item sm={12}>
                                 <Field
                                     name="name"
@@ -228,10 +228,17 @@ class TextFields extends React.Component {
   }
 }
 
+
 TextFields = reduxForm({ 
     form: 'contact',
     validate,
 })(TextFields);
 
 
-export default withStyles(styles)(TextFields);
+// TextFields = reduxForm({ 
+//     form: 'contact',
+//     validate,
+// })(withStyles(styles)(TextFields));
+
+export default TextFields
+// export default withStyles(styles)(TextFields);
